@@ -79,7 +79,29 @@ class Conference:
         self._conf = conf
         self._teams = []
 
+    def __contains__(self, team):
+        assert isinstance(team, Team)
+        for elem in self._teams:
+            if team == elem:
+                return True
+        return False
 
+    def __str__(self):
+        return "{} : {}".format(self._conf, str(self.win_ratio_avg()))
+
+    def name(self):
+        return self._conf
+
+    def add(self, team):
+        assert team.conf() == self._conf
+        self._teams.append(team)
+
+    def win_ratio_avg(self):
+        assert len(self._teams) > 0
+        total = 0
+        for team in self._teams:
+            total += team.win_ratio()
+        return total / len(self._teams)
 
 
 def build_team_list(filename):
