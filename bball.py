@@ -1,4 +1,5 @@
 class Team:
+    """"""
     def __init__(self, line):
         """Initializes the Team Object.
         Parameters: line is a non-empty line from the input file.
@@ -18,13 +19,14 @@ class Team:
         Returns: tuple of necessary data.
         Pre-condtions: line is nonempty.
         Post-condition: tuple is returned."""
-        assert line != ""
         assert isinstance(line, str)
-        name = line[:line.index("(")].strip()
-        conf = line[line.index("("):line.index(")") + 1].strip()
-        lst = line.split()
-        wins = lst[-2].strip()
-        losses = lst[-1].strip()
+        assert line != "" and "(" in line and ")" in line
+        line = line[::-1]
+        losses_wins = line[:line.index("(")].strip().split()
+        losses = losses_wins[0][::-1]
+        wins = losses_wins[1][::-1]
+        conf = line[line.index(")") + 1:line.index("(")][::-1]
+        name = line[line.index("(") + 1:].strip().split()[0][::-1]
         return (name, conf, int(wins), int(losses))
 
     def name(self):
@@ -51,8 +53,7 @@ class Team:
         Returns: float
         Pre-conditions: self exists and _losses is > 0.
         Post-conditions: float is returned"""
-        assert self._losses > 0
-        return self._wins / self._losses
+        return self._wins / (self._wins + self._losses)
 
     def __eq__(self, other):
         """Equal function for team. Only checks the name.
@@ -104,6 +105,38 @@ class Conference:
         return total / len(self._teams)
 
 
+class ConferenceSet:
+    def __init__(self):
+        """"""
+        self._conf_set = set()
+
+    def add(self, team):
+        assert isinstance(team, Team)
+        if not self._is_conference_in_list(team.conf()):
+            self._conf_set.add(Conference(team.conf()))
+        for elem in self._conf_set:
+            if elem.name() == team.conf():
+                elem.add(team)
+
+    def best(self):
+        ret_list = []
+        max = 0.0
+        for elem in self._conf_set:
+            if elem.win_ratio_avg() > max:
+                ret_list.clear()
+                ret_list.append(elem)
+                max = elem.win_ratio_avg()
+            elif elem.win_ratio_avg() == max:
+                ret_list.append(elem)
+        return ret_list
+
+    def _is_conference_in_list(self, conference):
+        for conf in self._conf_set:
+            if conf.name() == conference:
+                return True
+        return False
+
+
 def build_team_list(filename):
     """Constructs the team list from the given input file.
     Parameters: filename is a non-empty string.
@@ -122,3 +155,11 @@ def build_team_list(filename):
 def main():
     filename = input()
     team_list = build_team_list(filename)
+    conf_set = ConferenceSet()
+    for team in team_list:
+        conf_set.add(team)
+    for elem in conf_set.best():
+        print(elem)
+
+
+main()
