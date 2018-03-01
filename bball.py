@@ -1,5 +1,18 @@
 class Team:
-    """"""
+    """Team abstracts a basketball team.
+
+    Attributes:
+        _name   string for the Team name.
+        _conf   string for the conference the team belongs too.
+        _wins   integer for number of wins
+        _losses integer for number of losses.
+
+    Methods:
+        __init__(line)
+            constructor
+
+        _parse_line(line)
+            """
     def __init__(self, line):
         """Initializes the Team Object.
         Parameters: line is a non-empty line from the input file.
@@ -26,7 +39,7 @@ class Team:
         losses = losses_wins[0][::-1]
         wins = losses_wins[1][::-1]
         conf = line[line.index(")") + 1:line.index("(")][::-1]
-        name = line[line.index("(") + 1:].strip().split()[0][::-1]
+        name = line[line.index("(") + 1:].strip("123456789")[::-1]
         return (name, conf, int(wins), int(losses))
 
     def name(self):
